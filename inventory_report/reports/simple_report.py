@@ -3,30 +3,36 @@ from collections import Counter
 
 
 def oldest_manufacture(products):
-    return min([product["data_de_fabricacao"] for product in products])
+    dates = [product["data_de_fabricacao"] for product in products]
+    oldest = min(dates)
+    return oldest
 
 
-def closest_expiration(products):
-    now = datetime.now()
-    expired_dates = [
-        datetime.strptime(product["data_de_validade"], "%Y-%m-%d")
-        for product in products
-        if datetime.strptime(product["data_de_validade"], "%Y-%m-%d") < now
-    ]
-
-    return min(expired_dates)
+def closest_expiration(inventory):
+    valid_dates = []
+    for product in inventory:
+        valid_date = datetime.strptime(product["data_de_validade"], "%Y-%m-%d")
+        if valid_date > datetime.now():
+            valid_dates.append(product["data_de_validade"])
+    closest = min(valid_dates)
+    return closest
 
 
 def comp_with_more_products(company):
     companies = [product["nome_da_empresa"] for product in company]
-    return Counter(companies).most_common(1)[0][0]
+    most_common = Counter(companies).most_common(1)[0][0]
+    return most_common
 
 
 class SimpleReport:
     @staticmethod
     def generate(products):
-        return (
-            f"Data de fabricação mais antiga: {oldest_manufacture(products)}\n"
-            f"Data de validade mais próxima: {closest_expiration(products)}\n"
-            f"Empresa com mais produtos: {comp_with_more_products(products)}\n"
+        oldest_manufacture_date = oldest_manufacture(products)
+        closest_expiration_date = closest_expiration(products)
+        most_productive_company = comp_with_more_products(products)
+        report = (
+            f"Data de fabricação mais antiga: {oldest_manufacture_date}\n"
+            f"Data de validade mais próxima: {closest_expiration_date}\n"
+            f"Empresa com mais produtos: {most_productive_company}\n"
         )
+        return report
